@@ -260,7 +260,7 @@ public final class NatsRouter
         /**
          * These are the connections to the publishers.
          */
-        private final Set<Input<byte[]>> registrations = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        private final Set<Output<byte[]>> registrations = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
         public Publisher (final String subject)
         {
@@ -276,6 +276,7 @@ public final class NatsRouter
         public void connect (final Output<byte[]> connector)
         {
             actor.input().connect(connector);
+            registrations.add(connector);
         }
 
         public void disconnect (final Output<byte[]> connector)
@@ -331,6 +332,7 @@ public final class NatsRouter
         public void connect (final Input<byte[]> connector)
         {
             actor.output().connect(connector);
+            registrations.add(connector);
             dispatcher.subscribe(subject);
         }
 
@@ -353,27 +355,4 @@ public final class NatsRouter
             }
         }
     }
-
-//    public static void main (String[] args)
-//            throws Exception
-//    {
-//        final ScheduledExecutorService clock = Executors.newSingleThreadScheduledExecutor();
-//
-//        final Stage stage = Cascade.newStage();
-//        final Connection conn = Nats.connect();
-//
-//        final Actor<byte[], byte[]> actor0 = stage.newActor().withScript((byte[] x) -> x).create();
-//        final Actor<byte[], byte[]> actor1 = stage.newActor().withScript((byte[] x) -> System.out.println("X = " + new String(x))).create();
-//        final Actor<byte[], byte[]> actor2 = stage.newActor().withScript((byte[] x) -> System.out.println("Y = " + new String(x))).create();
-//
-//        final NatsRouter router = NatsRouter.newNatsRouter(stage, conn);
-//
-//        router.publish("ny.timesq", actor0.output());
-//        router.subscribe("ny.timesq", actor1.input());
-//        router.subscribe("ny.timesq", actor2.input());
-//
-//        clock.scheduleAtFixedRate(() -> actor0.input().send(Instant.now().toString().getBytes()), 0, 10, TimeUnit.MILLISECONDS);
-//
-//        Thread.sleep(100_000);
-//    }
 }
