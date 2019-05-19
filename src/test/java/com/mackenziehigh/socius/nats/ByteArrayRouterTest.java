@@ -20,12 +20,12 @@ import org.junit.Test;
 /**
  * Unit Test.
  */
-public final class NatsRouterTest
+public final class ByteArrayRouterTest
 {
     /**
      * Object Under Test.
      */
-    private NatsRouter router;
+    private ByteArrayRouter router;
 
     /**
      * This is the connection to the NATS broker.
@@ -50,22 +50,22 @@ public final class NatsRouterTest
     /**
      * Publisher #1.
      */
-    private final Actor<byte[], byte[]> actor1 = stage.newActor().withScript((byte[] x) -> x).create();
+    private final Actor<byte[], byte[]> actor1 = stage.newActor().withFunctionScript((byte[] x) -> x).create();
 
     /**
      * Publisher #2.
      */
-    private final Actor<byte[], byte[]> actor2 = stage.newActor().withScript((byte[] x) -> x).create();
+    private final Actor<byte[], byte[]> actor2 = stage.newActor().withFunctionScript((byte[] x) -> x).create();
 
     /**
      * Subscriber #1.
      */
-    private final Actor<byte[], Boolean> actor3 = stage.newActor().withScript((byte[] x) -> queue1.add(x)).create();
+    private final Actor<byte[], Boolean> actor3 = stage.newActor().withFunctionScript((byte[] x) -> queue1.add(x)).create();
 
     /**
      * Subscriber #2.
      */
-    private final Actor<byte[], Boolean> actor4 = stage.newActor().withScript((byte[] x) -> queue2.add(x)).create();
+    private final Actor<byte[], Boolean> actor4 = stage.newActor().withFunctionScript((byte[] x) -> queue2.add(x)).create();
 
     @Before
     public void setup ()
@@ -73,7 +73,7 @@ public final class NatsRouterTest
                    InterruptedException
     {
         connection = Nats.connect();
-        router = NatsRouter.newNatsRouter(stage, connection);
+        router = ByteArrayRouter.newNatsRouter(stage, connection);
 
         assertEquals(CONNECTED, connection.getStatus());
     }

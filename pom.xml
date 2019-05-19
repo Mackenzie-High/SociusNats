@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mackenziehigh</groupId>
     <artifactId>socius-nats</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <build>
@@ -14,6 +14,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.21.0</version>
                 <configuration>
                     <testFailureIgnore>true</testFailureIgnore>
 
@@ -59,8 +60,29 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
 
+            <!-- This plugin builds the assembly tar-ball for release.-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>socius-core</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        
+        </plugins>
     </build>
 
     <dependencies>
@@ -68,7 +90,7 @@
         <dependency>
             <groupId>com.mackenziehigh</groupId>
             <artifactId>cascade</artifactId>
-            <version>[0.0,)</version>
+            <version>2.0.1</version>
         </dependency>
 
         <dependency>
@@ -81,37 +103,14 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>mackenziehigh</id>
-            <url>http://www.mackenziehigh.com/content/maven/repo/</url>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>jenkins</id>
-            <url>http://jenkins:8080/content/maven/repo/</url>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-        </repository>
-    </repositories>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>12</maven.compiler.source>
+        <maven.compiler.target>12</maven.compiler.target>
     </properties>
 </project>

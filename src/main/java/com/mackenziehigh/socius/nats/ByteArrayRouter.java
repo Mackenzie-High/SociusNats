@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentMap;
  * </ul>
  * </p>
  */
-public final class NatsRouter
+public final class ByteArrayRouter
         implements AutoCloseable
 {
     /**
@@ -83,8 +83,8 @@ public final class NatsRouter
      */
     private final Object lock = new Object();
 
-    private NatsRouter (final Stage stage,
-                        final Connection connection)
+    private ByteArrayRouter (final Stage stage,
+                             final Connection connection)
     {
         this.stage = Objects.requireNonNull(stage, "stage");
         this.connection = Objects.requireNonNull(connection, "connection");
@@ -115,8 +115,8 @@ public final class NatsRouter
      * @param subject will identify the outgoing messages.
      * @return this.
      */
-    public NatsRouter publish (final Output<byte[]> connector,
-                               final String subject)
+    public ByteArrayRouter publish (final Output<byte[]> connector,
+                                    final String subject)
     {
         Objects.requireNonNull(subject, "subject");
         Objects.requireNonNull(connector, "connector");
@@ -137,8 +137,8 @@ public final class NatsRouter
      * @param subject identifies the incoming messages.
      * @return this.
      */
-    public NatsRouter subscribe (final Input<byte[]> connector,
-                                 final String subject)
+    public ByteArrayRouter subscribe (final Input<byte[]> connector,
+                                      final String subject)
     {
         Objects.requireNonNull(subject, "subject");
         Objects.requireNonNull(connector, "connector");
@@ -159,8 +159,8 @@ public final class NatsRouter
      * @param subject is needed to identify the connection.
      * @return this.
      */
-    public NatsRouter unpublish (final Output<byte[]> connector,
-                                 final String subject)
+    public ByteArrayRouter unpublish (final Output<byte[]> connector,
+                                      final String subject)
     {
         Objects.requireNonNull(subject, "subject");
         Objects.requireNonNull(connector, "connector");
@@ -180,8 +180,8 @@ public final class NatsRouter
      * @param subject is needed to identify the connection.
      * @return this.
      */
-    public NatsRouter unsubscribe (final Input<byte[]> connector,
-                                   final String subject)
+    public ByteArrayRouter unsubscribe (final Input<byte[]> connector,
+                                        final String subject)
     {
         Objects.requireNonNull(subject, "subject");
         Objects.requireNonNull(connector, "connector");
@@ -201,10 +201,10 @@ public final class NatsRouter
      * @param connection will be used to connect to the NATS broker.
      * @return the new router.
      */
-    public static NatsRouter newNatsRouter (final Stage stage,
-                                            final Connection connection)
+    public static ByteArrayRouter newNatsRouter (final Stage stage,
+                                                 final Connection connection)
     {
-        return new NatsRouter(stage, connection);
+        return new ByteArrayRouter(stage, connection);
     }
 
     /**
@@ -280,7 +280,7 @@ public final class NatsRouter
         public Publisher (final String subject)
         {
             this.subject = subject;
-            this.actor = stage.newActor().withScript(this::onMessage).create();
+            this.actor = stage.newActor().withConsumerScript(this::onMessage).create();
         }
 
         private void onMessage (final byte[] message)
@@ -336,12 +336,12 @@ public final class NatsRouter
         public Subscriber (final String subject)
         {
             this.subject = subject;
-            this.actor = stage.newActor().withScript((byte[] x) -> x).create();
+            this.actor = stage.newActor().withFunctionScript((byte[] x) -> x).create();
         }
 
         public void accept (final Message message)
         {
-            actor.accept(message.getData());
+            actor.input().send(message.getData());
         }
 
         public void connect (final Input<byte[]> connector)
